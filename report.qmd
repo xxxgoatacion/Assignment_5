@@ -1,0 +1,139 @@
+---
+title: " World Development dataset analysis"
+author: "Peter Guo"
+date: "2025-2-26"
+format:
+  html:
+    code-fold: true
+  pdf: default
+bibliography: references.bib
+---
+
+## 2. Load the dataset using R.
+```{r}
+library(tidyverse)
+wdi_data <- read.csv("wdi.csv", header = TRUE)
+```
+
+## 3.Conduct exploratory data analysis on at least three indicators of your choice. Summarise your findings in markdown sections.
+- Summary Statistics
+```{r}
+# Summary for GDP per Capita
+gdp_per_capita_summary <- summary(wdi_data$gdp_per_capita)
+gdp_per_capita_summary
+
+# Summary for Life Expectancy
+life_expectancy_summary <- summary(wdi_data$life_expectancy)
+life_expectancy_summary
+
+# Summary for Total Population
+total_population_summary <- summary(wdi_data$total_population)
+total_population_summary
+```
+The summary provides key metrics (minimum, 1st quartile, median, mean, 3rd quartile, maximum) for each indicator. This helps us understand the central tendency and spread of the data.
+
+- Correlation Analysis
+```{r}
+# Calculate correlation matrix
+cor_matrix <- wdi_data %>% 
+  select(gdp_per_capita, life_expectancy, total_population) %>% 
+  cor(use = "complete.obs")
+print(cor_matrix)
+```
+The correlation matrix shows the linear relationships between the variables. For example, a positive correlation between GDP per Capita and Life Expectancy might suggest that countries with higher incomes tend to have longer life expectancies.
+
+The correlation matrix shows a moderate positive relationship between GDP per capita and life expectancy (r ≈ 0.64), indicating that higher income levels are generally associated with longer life expectancies. In contrast, both GDP per capita and life expectancy have almost no relationship with total population (r ≈ -0.06 and r ≈ -0.01, respectively), suggesting that a country's population size does not significantly impact these measures.
+
+## 4.Create at least two different types of plots (e.g., bar chart, scatter plot) to represent your analysis. Use Quarto code chunks to embed these visualisations. Add a title and axis labels to each plot. Use Quarto to include a caption and a reference to the source of the data. Hide your code in the final document.
+
+- top 20 countries with the highest GDP per Capita
+```{r, echo=FALSE, fig.cap="Figure 1: Bar chart of GDP per Capita by Country (Top 20, 2022, in ascending order). Data source: World Development Indicators.", `fig-label`="gdp_bar"}
+library(ggplot2)
+library(dplyr)
+
+# Select top 20 countries with the highest GDP per Capita and arrange them in ascending order
+top20 <- wdi_data %>% 
+  arrange(desc(gdp_per_capita)) %>% 
+  head(20) %>% 
+  arrange(gdp_per_capita)
+
+# Create the bar chart
+gdp_bar <- ggplot(top20, aes(x = reorder(country, gdp_per_capita), y = gdp_per_capita)) +
+  geom_bar(stat = "identity", fill = "skyblue") +
+  labs(title = "GDP per Capita by Country (Top 20, 2022)",
+       x = "Country",
+       y = "GDP per Capita (USD)") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+gdp_bar
+
+# save the plot for external use
+ggsave("gdp_bar.png", gdp_bar, width = 10, height = 6)
+
+
+```
+- Scatter plot of GDP per Capita vs. Life Expectancy
+```{r, echo=FALSE, fig.cap="Figure 2: Scatter plot of GDP per Capita vs. Life Expectancy (2022). Data source: World Development Indicators.", `fig-label`="scatter_plot"}
+
+scatter_plot <- ggplot(wdi_data, aes(x = life_expectancy, y = gdp_per_capita)) +
+  geom_point(color = "darkred") +
+  labs(
+    title = "GDP per Capita vs Life Expectancy (2022)",
+    x = "Life Expectancy (Years)",
+    y = "GDP per Capita (USD)"
+  ) +
+  theme_minimal()
+
+scatter_plot
+
+
+ggsave("scatter_plot_switched.png", scatter_plot, width = 10, height = 6)
+
+```
+
+## 5. Construct a table that highlights some key statistics from your analysis. Ensure the table is well-formatted and included in the report.
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap="data source:World Development Indicators.", `fig-label`="stats_table"}
+library(dplyr)
+library(gt)
+
+stats_gdp <- wdi_data %>%
+  summarise(
+    Median = median(gdp_per_capita, na.rm = TRUE),
+    Variance = var(gdp_per_capita, na.rm = TRUE),
+    Mean = mean(gdp_per_capita, na.rm = TRUE)
+  ) %>%
+  mutate(Indicator = "GDP per Capita")
+
+stats_life <- wdi_data %>%
+  summarise(
+    Median = median(life_expectancy, na.rm = TRUE),
+    Variance = var(life_expectancy, na.rm = TRUE),
+    Mean = mean(life_expectancy, na.rm = TRUE)
+  ) %>%
+  mutate(Indicator = "Life Expectancy")
+
+
+stats_combined <- bind_rows(stats_gdp, stats_life) %>%
+  select(Indicator, Median, Variance, Mean)
+
+
+stats_combined %>%
+  gt() %>%
+  fmt_number(
+    columns = c(Median, Variance, Mean),
+    decimals = 0
+  ) %>%
+  tab_header(
+    title = "Key Statistics for Selected Indicators (2022)",
+    subtitle = "Data source: World Development Indicators"
+  )
+
+
+```
+
+## 6. Include cross-references to your figures and tables within the text. Demonstrate proper labeling and referencing techniques.
+
+In this report, we presented a bar chart (Figure @ref(gdp_bar)) that displays the top 20 countries by GDP per Capita, a scatter plot (Figure @ref(scatter_plot)) that illustrates the relationship between Life Expectancy and GDP per Capita, and a summary table (Table @ref(stats_table)) showing the key statistics for these indicators. The cross-references ensure that readers can easily navigate to the relevant figures and table for further details.
+
+## 7. Add a bibliography using BibTeX (.bib). Cite at least two sources related to your analysis.
+This report cites the findings from [@Smith2021] and [@Doe2020].

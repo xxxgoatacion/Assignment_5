@@ -1,0 +1,49 @@
+---
+title: "World Development Indicators Presentation"
+author: "Peter Guo"
+date: "2025-2-26"
+format:
+  revealjs:
+    theme: solarized
+    transition: slide
+bibliography: references.bib
+---
+
+## Introduction
+
+This presentation summarizes the analysis of key indicators from the World Development Indicators dataset for 2022.  
+Please refer to Figure \@ref(gdp_bar) and Figure \@ref(scatter_plot) in the full report for details.
+
+--------------------------------------------------------------------------
+
+## Visualization: Bar Chart
+
+![](gdp_bar.png){width=100%}
+
+--------------------------------------------------------------------------
+
+## Visualization: Scatter Plot
+
+![](scatter_plot.png){width=100%}
+
+--------------------------------------------------------------------------
+
+## Key Findings
+
+- **GDP per Capita** is strongly correlated with **Life Expectancy**.
+
+- **Population size** has little impact on these indicators.
+
+- Additional insights can be found in the detailed report.
+
+--------------------------------------------------------------------------
+
+## Conclusion
+
+<br>
+
+Thank you for your attention!  
+
+For more details, please refer to the full report.
+
+
